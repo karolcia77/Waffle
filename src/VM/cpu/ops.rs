@@ -1,4 +1,4 @@
-use crate::vm::cpu::arch::{WAFFLE, Flags, Register};
+use crate::vm::cpu::arch::{WAFFLE};
 use crate::vm::instructions::Instructions as INST;
 
 fn fetch(cpu: &mut WAFFLE) {
@@ -11,16 +11,16 @@ fn execute(cpu: &mut WAFFLE) {
     let destination = cpu.pc + 9;
     match cpu.inst {
         INST::CLF   => cpu.flags_clear(),
-        INST::HALT  => cpu.flag_set(Flags::HALT),
-        INST::PSH   => cpu.stack_push(cpu.registers[cpu.mem[cpu.pc]]),
-        INST::PSHF  => cpu.stack_push(cpu.fregisters[cpu.mem[cpu.pc]]),
+        INST::HALT  => {},
+        INST::PSH   => cpu.stack_push(cpu.registers[cpu.memory_read(destination) as usize]),
+        INST::PSHF  => cpu.stack_pushf(cpu.fregisters[cpu.memory_read(destination) as usize -8]),
         INST::POP   => {}
         INST::POPF   => {}
-        INST::DSPL  => print!("{}",cpu.registers[cpu.dest]),
-        INST::DSPLN => println!("{}",cpu.registers[cpu.dest]),
+        INST::DSPL  => print!("{}",cpu.registers[cpu.memory_read(destination) as usize]),
+        INST::DSPLN => println!("{}",cpu.registers[cpu.memory_read(destination) as usize]),
 
-        INST::MOV => {cpu.registers[cpu.memory_read(destination)] = cpu.registers[cpu.memory_read(source)]},
-        INST::MOVF => cpu.fregisters[cpu.memory_readf(destination) - 8] = cpu.fregisters[cpu.memory_read(source) - 8],
+        INST::MOV => {cpu.registers[cpu.memory_read(destination) as usize] = cpu.registers[cpu.memory_read(source) as usize]},
+        INST::MOVF => cpu.fregisters[cpu.memory_read(destination) as usize - 8] = cpu.fregisters[cpu.memory_read(source) as usize - 8],
         INST::LDI => {},
         INST::STI => {},
         INST::LLI => {},
@@ -38,7 +38,7 @@ fn execute(cpu: &mut WAFFLE) {
 
 
 pub fn run(cpu: &mut WAFFLE) {
-    while !cpu.flag_check(Flags::HALT) {
+    while cpu.inst != INST::STOP {
         fetch(cpu);
         execute(cpu);
     }

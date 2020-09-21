@@ -55,44 +55,65 @@ impl WAFFLE {
         }
     }
 
-    pub fn stack_push(&mut self, data: T) where T: i64 + f64{
+    pub fn cast_to_bytes(&self, data: i64) -> [u8; 8] {
         if self._platform_big_endian {
-            data = data.to_be_bytes();
+            data.to_be_bytes()
         } else {
-            data = data.to_le_bytes();
+            data.to_le_bytes()
         }
+    }
+
+    pub fn cast_to_bytesf(&self, data: f64) -> [u8; 8] {
+        if self._platform_big_endian {
+            data.to_be_bytes()
+        } else {
+            data.to_le_bytes()
+        }
+    }
+
+    pub fn stack_push(&mut self, data: i64){
+        let res = self.cast_to_bytes(data);
         self.sp -= 1;
-        for val in data {
-            self.mem[self.sp] = val;
+        for val in &res {
+            self.mem[self.sp] = *val;
             self.sp -= 1
         }
     }
 
-    pub fn memory_read(&mut self, addr: usize) -> i64 {
+    pub fn stack_pushf(&mut self, data: f64){
+        let res = self.cast_to_bytesf(data);
+        self.sp -= 1;
+        for val in &res {
+            self.mem[self.sp] = *val;
+            self.sp -= 1
+        }
+    }
+
+    pub fn memory_read(&self, addr: usize) -> i64 {
         let mut arr = [0u8; 8];
         for ptr in 0..8 {
             arr[ptr] = self.mem[addr+ptr];
         }
         if self._platform_big_endian{
-            i64::from_be_bytes(arr[ptr])
+            i64::from_be_bytes(arr)
         } else {
-            i64::from_le_bytes(arr[ptr])
+            i64::from_le_bytes(arr)
         }
     }
 
-    pub fn memory_readf(&mut self, addr: usize) -> f64 {
+    pub fn memory_readf(&self, addr: usize) -> f64 {
         let mut arr = [0u8; 8];
         for ptr in 0..8 {
             arr[ptr] = self.mem[addr+ptr];
         }
         if self._platform_big_endian{
-            f64::from_be_bytes(arr[ptr])
+            f64::from_be_bytes(arr)
         } else {
-            f64::from_le_bytes(arr[ptr])
+            f64::from_le_bytes(arr)
         }
     }
 
-    pub fn register_write(&mut self, register: u8, data: [u8; 8]) {
+    pub fn register_write(&mut self, register: usize, data: [u8; 8]) {
         if self._platform_big_endian {
             self.registers[register] = i64::from_be_bytes(data)
         } else {
@@ -100,7 +121,7 @@ impl WAFFLE {
         }
     }
 
-    pub fn fregister_write(&mut self, register: u8, data: [u8; 8]) {
+    pub fn fregister_write(&mut self, register: usize, data: [u8; 8]) {
         if self._platform_big_endian {
             self.fregisters[register] = f64::from_be_bytes(data)
         } else {
