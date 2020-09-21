@@ -34,9 +34,7 @@ pub struct WAFFLE {
 }
 
 fn is_big_endian() -> bool {
-    if cfg!(target_endian="big") {
-        true
-    } else {false}
+    cfg!(target_endian="big")
 }
 
 
@@ -90,10 +88,8 @@ impl WAFFLE {
     }
 
     pub fn memory_read(&self, addr: usize) -> i64 {
-        let mut arr = [0u8; 8];
-        for ptr in 0..8 {
-            arr[ptr] = self.mem[addr+ptr];
-        }
+        let mut arr = [0u8;8];
+        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el);
         if self._platform_big_endian{
             i64::from_be_bytes(arr)
         } else {
@@ -102,10 +98,8 @@ impl WAFFLE {
     }
 
     pub fn memory_readf(&self, addr: usize) -> f64 {
-        let mut arr = [0u8; 8];
-        for ptr in 0..8 {
-            arr[ptr] = self.mem[addr+ptr];
-        }
+        let mut arr = [0u8;8];
+        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el);
         if self._platform_big_endian{
             f64::from_be_bytes(arr)
         } else {
