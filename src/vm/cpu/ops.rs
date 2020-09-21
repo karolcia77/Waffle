@@ -15,7 +15,7 @@ fn execute(cpu: &mut WAFFLE) {
         INST::PSH   => cpu.stack_push(cpu.registers[cpu.memory_read(destination) as usize]),
         INST::PSHF  => cpu.stack_pushf(cpu.fregisters[cpu.memory_read(destination) as usize -8]),
         INST::POP   => {}
-        INST::POPF   => {}
+        INST::POPF  => {}
         INST::DSPL  => print!("{}",cpu.registers[cpu.memory_read(destination) as usize]),
         INST::DSPLN => println!("{}",cpu.registers[cpu.memory_read(destination) as usize]),
 

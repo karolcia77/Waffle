@@ -121,7 +121,7 @@ impl WAFFLE {
         }
     }
 
-    pub fn fregister_write(&mut self, register: usize, data: [u8; 8]) {
+    pub fn register_writef(&mut self, register: usize, data: [u8; 8]) {
         if self._platform_big_endian {
             self.fregisters[register] = f64::from_be_bytes(data)
         } else {
