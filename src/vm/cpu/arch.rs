@@ -39,7 +39,7 @@ fn is_big_endian() -> bool {
 
 
 impl WAFFLE {
-    pub fn new(mem_size: usize) -> Self {
+    pub fn new(mem_size: usize) -> WAFFLE {
         WAFFLE {
             mem: Vec::with_capacity(mem_size),
             mem_size,
@@ -51,6 +51,10 @@ impl WAFFLE {
             inst: Instructions::HALT,
             _platform_big_endian: is_big_endian(),
         }
+    }
+
+    pub fn load_program(&mut self, prog: Vec<u8>) {
+        self.mem = prog
     }
 
     pub fn cast_to_bytes(&self, data: i64) -> [u8; 8] {
@@ -89,7 +93,7 @@ impl WAFFLE {
 
     pub fn memory_read(&self, addr: usize) -> i64 {
         let mut arr = [0u8;8];
-        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el);
+        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
         if self._platform_big_endian{
             i64::from_be_bytes(arr)
         } else {
@@ -99,7 +103,7 @@ impl WAFFLE {
 
     pub fn memory_readf(&self, addr: usize) -> f64 {
         let mut arr = [0u8;8];
-        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el);
+        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
         if self._platform_big_endian{
             f64::from_be_bytes(arr)
         } else {
@@ -107,20 +111,12 @@ impl WAFFLE {
         }
     }
 
-    pub fn register_write(&mut self, register: usize, data: [u8; 8]) {
-        if self._platform_big_endian {
-            self.registers[register] = i64::from_be_bytes(data)
-        } else {
-            self.registers[register] = i64::from_le_bytes(data)
-        }
+    pub fn register_write(&mut self, register: usize, data: i64) {
+        self.registers[register] = data;
     }
 
-    pub fn register_writef(&mut self, register: usize, data: [u8; 8]) {
-        if self._platform_big_endian {
-            self.fregisters[register] = f64::from_be_bytes(data)
-        } else {
-            self.fregisters[register] = f64::from_le_bytes(data)
-        }
+    pub fn register_writef(&mut self, register: usize, data: f64) {
+        self.fregisters[register] = data;
     }
 
     pub fn flags_clear(&mut self) {self.flags = 0;}
