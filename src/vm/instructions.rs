@@ -1,13 +1,15 @@
 use std::process::exit;
+use std::str::FromStr;
+use crate::vm::types::Types;
 
 #[derive(PartialEq, PartialOrd, Debug)]
-pub enum Instructions {
-    CLF,                      // Clear CPU Flags
-    MOV, MOVF, INC, DEC,      // Register ops
-    CMP, CMPF, CMPI, CMPFI,   // Compare ops
-    LDI, LDF, STI, STF,       // Memory ops
+pub enum Instruction {
+    CLF,                      // Clear CPU Flags [0]
+    MOV, MOVF, INC, DEC,      // Register ops [2;1]
+    CMP, CMPF, CMPI, CMPFI,   // Compare ops  [2]
+    LDI, LDF, STI, STF,       // Memory ops  [2]
     PSH, POP, PSHF, POPF,     // STACK ops
-    LLI, LLF,                 // Local Load <Int/Float>
+    LLI, LLF,                 // Local Load <Int/Float> [2]
     ADD, SUB, MUL, DIV,       // MATH
     FADD, FSUB, FMUL, FDIV,   // MATH float
     JA, JB, JE, JNE, JMP,     // Conditions
@@ -21,61 +23,183 @@ pub enum Instructions {
     STOP
 }
 
-impl From<u8> for Instructions {
+
+impl Instruction {
+    pub fn arg_types_map(&self) -> Vec<Types>{
+        match self {
+            Instruction::STOP => vec![Types::OPERATION],
+            Instruction::HALT => vec![Types::OPERATION],
+            Instruction::PSH => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::POP => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::PSHF => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::POPF => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::DSPL => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::DSPLN => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::MOV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::LDI => vec![Types::OPERATION, Types::REGISTER, Types::ADDRESS],
+            Instruction::STI => vec![Types::OPERATION, Types::ADDRESS, Types::REGISTER],
+            Instruction::LLI => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
+            Instruction::ADD => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::SUB => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::MUL => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::DIV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::SHR => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
+            Instruction::SHL => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
+            Instruction::MOVF => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::LDF => vec![Types::OPERATION, Types::REGISTER, Types::ADDRESS],
+            Instruction::STF => vec![Types::OPERATION, Types::ADDRESS, Types::REGISTER],
+            Instruction::LLF => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
+            Instruction::FADD => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::FSUB => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::FMUL => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::FDIV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::LAND => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::LOR => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::LNOT => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::AND => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::OR => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::XOR => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::NOT => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::JMP => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JA => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JB => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JE => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JNE => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JZ => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JNZ => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JC => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JNC => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JS => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JNS => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JL => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JNL => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JP => vec![Types::OPERATION, Types::ADDRESS],
+            Instruction::JNP => vec![Types::OPERATION, Types::ADDRESS],
+            _ => exit(42),
+        }
+    }
+}
+
+
+impl FromStr for Instruction {
+    type Err = ();
+    fn from_str(orig: &str) -> Result<Instruction, ()> {
+        let op = match orig {
+            "STOP" => Instruction::STOP,
+            "HALT" => Instruction::HALT,
+            "PSH" => Instruction::PSH,
+            "POP" => Instruction::POP,
+            "PSHF" => Instruction::PSHF,
+            "POPF" => Instruction::POPF,
+            "DSPL" => Instruction::DSPL,
+            "DSPLN" => Instruction::DSPLN,
+            // INT
+            "MOV" => Instruction::MOV,
+            "LDI" => Instruction::LDI,
+            "STI" => Instruction::STI,
+            "LLI" => Instruction::LLI,
+            "ADD" => Instruction::ADD,
+            "SUB" => Instruction::SUB,
+            "MUL" => Instruction::MUL,
+            "DIV" => Instruction::DIV,
+            "SHR" => Instruction::SHR,
+            "SHL" => Instruction::SHL,
+            // FLOAT
+            "MOVF" => Instruction::MOVF,
+            "LDF" => Instruction::LDF,
+            "STF" => Instruction::STF,
+            "LLF" => Instruction::LLF,
+            "FADD" => Instruction::FADD,
+            "FSUB" => Instruction::FSUB,
+            "FMUL" => Instruction::FMUL,
+            "FDIV" => Instruction::FDIV,
+            // LOGIC & BINARY
+            "LAND" => Instruction::LAND,
+            "LOR" => Instruction::LOR,
+            "LNOT" => Instruction::LNOT,
+            "AND" => Instruction::AND,
+            "OR" => Instruction::OR,
+            "XOR" => Instruction::XOR,
+            "NOT" => Instruction::NOT,
+            // CONDITION
+            "JMP" => Instruction::JMP,
+            "JA" => Instruction::JA,
+            "JB" => Instruction::JB,
+            "JE" => Instruction::JE,
+            "JNE" => Instruction::JNE,
+            "JZ" => Instruction::JZ,
+            "JNZ" => Instruction::JNZ,
+            "JC" => Instruction::JC,
+            "JNC" => Instruction::JNC,
+            "JS" => Instruction::JS,
+            "JNS" => Instruction::JNS,
+            "JL" => Instruction::JL,
+            "JNL" => Instruction::JNL,
+            "JP" => Instruction::JP,
+            "JNP" => Instruction::JNP,
+            // INVALID OPCODES
+            _ => exit(42)
+        };
+        Ok(op)
+    }
+}
+
+
+impl From<u8> for Instruction {
     fn from(orig: u8) -> Self {
         match orig {
-            0x00 => Instructions::STOP,
-            0x01 => Instructions::HALT,
-            0x02 => Instructions::PSH,
-            0x03 => Instructions::POP,
-            0x04 => Instructions::PSHF,
-            0x05 => Instructions::POPF,
-            0x06 => Instructions::DSPL,
-            0x07 => Instructions::DSPLN,
+            0x00 => Instruction::STOP,
+            0x01 => Instruction::HALT,
+            0x02 => Instruction::PSH,
+            0x03 => Instruction::POP,
+            0x04 => Instruction::PSHF,
+            0x05 => Instruction::POPF,
+            0x06 => Instruction::DSPL,
+            0x07 => Instruction::DSPLN,
             // INT
-            0x10 => Instructions::MOV,
-            0x11 => Instructions::LDI,
-            0x12 => Instructions::STI,
-            0x13 => Instructions::LLI,
-            0x14 => Instructions::ADD,
-            0x15 => Instructions::SUB,
-            0x16 => Instructions::MUL,
-            0x17 => Instructions::DIV,
-            0x18 => Instructions::SHR,
-            0x19 => Instructions::SHL,
+            0x10 => Instruction::MOV,
+            0x11 => Instruction::LDI,
+            0x12 => Instruction::STI,
+            0x13 => Instruction::LLI,
+            0x14 => Instruction::ADD,
+            0x15 => Instruction::SUB,
+            0x16 => Instruction::MUL,
+            0x17 => Instruction::DIV,
+            0x18 => Instruction::SHR,
+            0x19 => Instruction::SHL,
             // FLOAT
-            0x20 => Instructions::MOVF,
-            0x21 => Instructions::LDF,
-            0x22 => Instructions::STF,
-            0x23 => Instructions::LLF,
-            0x24 => Instructions::FADD,
-            0x25 => Instructions::FSUB,
-            0x26 => Instructions::FMUL,
-            0x27 => Instructions::FDIV,
+            0x20 => Instruction::MOVF,
+            0x21 => Instruction::LDF,
+            0x22 => Instruction::STF,
+            0x23 => Instruction::LLF,
+            0x24 => Instruction::FADD,
+            0x25 => Instruction::FSUB,
+            0x26 => Instruction::FMUL,
+            0x27 => Instruction::FDIV,
             // LOGIC & BINARY
-            0x30 => Instructions::LAND,
-            0x31 => Instructions::LOR,
-            0x32 => Instructions::LNOT,
-            0x33 => Instructions::AND,
-            0x34 => Instructions::OR,
-            0x35 => Instructions::XOR,
-            0x36 => Instructions::NOT,
+            0x30 => Instruction::LAND,
+            0x31 => Instruction::LOR,
+            0x32 => Instruction::LNOT,
+            0x33 => Instruction::AND,
+            0x34 => Instruction::OR,
+            0x35 => Instruction::XOR,
+            0x36 => Instruction::NOT,
             // CONDITION
-            0x40 => Instructions::JMP,
-            0x41 => Instructions::JA,
-            0x42 => Instructions::JB,
-            0x43 => Instructions::JE,
-            0x44 => Instructions::JNE,
-            0x45 => Instructions::JZ,
-            0x46 => Instructions::JNZ,
-            0x47 => Instructions::JC,
-            0x48 => Instructions::JNC,
-            0x49 => Instructions::JS,
-            0x4A => Instructions::JNS,
-            0x4B => Instructions::JL,
-            0x4C => Instructions::JNL,
-            0x4D => Instructions::JP,
-            0x4E => Instructions::JNP,
+            0x40 => Instruction::JMP,
+            0x41 => Instruction::JA,
+            0x42 => Instruction::JB,
+            0x43 => Instruction::JE,
+            0x44 => Instruction::JNE,
+            0x45 => Instruction::JZ,
+            0x46 => Instruction::JNZ,
+            0x47 => Instruction::JC,
+            0x48 => Instruction::JNC,
+            0x49 => Instruction::JS,
+            0x4A => Instruction::JNS,
+            0x4B => Instruction::JL,
+            0x4C => Instruction::JNL,
+            0x4D => Instruction::JP,
+            0x4E => Instruction::JNP,
             // INVALID OPCODES
             _ => exit(42)
         }

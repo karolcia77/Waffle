@@ -1,5 +1,5 @@
 use crate::vm::cpu::arch::{WAFFLE};
-use crate::vm::instructions::Instructions as INST;
+use crate::vm::instructions::Instruction as INST;
 
 fn fetch(cpu: &mut WAFFLE) {
     cpu.pc+=1;
@@ -44,7 +44,7 @@ fn execute(cpu: &mut WAFFLE) {
         INST::LDI => {},
         INST::STI => {},
         INST::LLI => cpu.register_write(cpu.memory_read(destination) as usize, cpu.memory_read(source)),
-        INST::ADD => {},
+        INST::ADD => cpu.register_write(cpu.registers[]),
         INST::SUB => {},
         INST::MUL => {},
         INST::DIV => {},

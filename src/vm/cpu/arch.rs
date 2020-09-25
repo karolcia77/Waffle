@@ -1,8 +1,60 @@
-use crate::vm::instructions::Instructions;
+use crate::vm::instructions::Instruction;
+use std::str::FromStr;
+use std::process::exit;
 
 pub enum Register {
     AX, BX, CX, DX, EX, FX, GX, HX,
     FAX, FBX, FCX, FDX, FEX, FFX, FGX, FHX,
+}
+
+impl FromStr for Register {
+    type Err = ();
+    fn from_str(orig: &str) -> Result<Register, ()> {
+        let reg = match orig {
+            "AX" => Register::AX,
+            "BX" => Register::BX,
+            "CX" => Register::CX,
+            "DX" => Register::DX,
+            "EX" => Register::EX,
+            "FX" => Register::FX,
+            "GX" => Register::GX,
+            "HX" => Register::HX,
+            "FAX" => Register::FAX,
+            "FBX" => Register::FBX,
+            "FCX" => Register::FCX,
+            "FDX" => Register::FDX,
+            "FEX" => Register::FEX,
+            "FFX" => Register::FFX,
+            "FGX" => Register::FGX,
+            "FHX" => Register::FHX,
+            _ => exit(42),
+        };
+        Ok(reg)
+    }
+}
+
+impl From<u8> for Register {
+    fn from(orig: u8) -> Self {
+        match orig {
+            0x00 => Register::AX,
+            0x01 => Register::BX,
+            0x02 => Register::CX,
+            0x03 => Register::DX,
+            0x04 => Register::EX,
+            0x05 => Register::FX,
+            0x06 => Register::GX,
+            0x07 => Register::HX,
+            0x08 => Register::FAX,
+            0x09 => Register::FBX,
+            0x0a => Register::FCX,
+            0x0b => Register::FDX,
+            0x0c => Register::FEX,
+            0x0d => Register::FFX,
+            0x0e => Register::FGX,
+            0x0f => Register::FHX,
+            _ => exit(42),
+        }
+    }
 }
 
 
@@ -29,7 +81,7 @@ pub struct WAFFLE {
     pub registers: [i64; 8],
     pub fregisters: [f64; 8],
     flags: u8,
-    pub inst: Instructions,
+    pub inst: Instruction,
     _platform_big_endian: bool
 }
 
@@ -48,7 +100,7 @@ impl WAFFLE {
             registers: [0; 8],
             fregisters: [0.0; 8],
             flags: 0b00000000,
-            inst: Instructions::HALT,
+            inst: Instruction::HALT,
             _platform_big_endian: is_big_endian(),
         }
     }

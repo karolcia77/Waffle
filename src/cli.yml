@@ -2,13 +2,33 @@ name: WAFFLE
 version: "0.0.1a"
 author: iy <github.com/Nyanguy>
 about: It's a stack-based VM
-args:
-  - binary:
-      short: b
-      long: binary
-      value_name: BINARY
-      help: Sets the mode for the file execution. If set, it will try to execute the byte-code directly.
-  - FILE:
-      help: Sets the source file to use.
-      required: true
-      index: 1
+
+subcommands:
+  - run:
+      - help: Runs the specified bytecode file. it will try to execute the bytecode directly.
+      - args:
+          - FILE:
+              help: Sets the bytecode file in use.
+              required: true
+              value_name: FILE
+              index: 1
+          - MEMORY:
+              help: Sets the amount of the memory pool in bytes.
+              index: 2
+              value_name: MEMORY
+              default_value: 1024
+  - compile:
+      help: Creates a bytecode file.
+      args:
+        - FILE:
+            help: Sets the source file in use.
+            required: true
+            takes_value: true
+            value_name: BINARY
+            index: 1
+        - OUT:
+            help: Sets the destination file with the bytecode.
+            takes_value: true
+            value_name: OUT
+            index: 2
+            default_value: o.out
