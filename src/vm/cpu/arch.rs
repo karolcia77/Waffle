@@ -1,7 +1,9 @@
 use crate::vm::instructions::Instruction;
 use std::str::FromStr;
+use std::convert::From;
 use std::process::exit;
 
+#[derive(Copy, Clone)]
 pub enum Register {
     AX, BX, CX, DX, EX, FX, GX, HX,
     FAX, FBX, FCX, FDX, FEX, FFX, FGX, FHX,
@@ -58,6 +60,11 @@ impl From<u8> for Register {
 }
 
 
+pub fn get_register_idx(reg: &Register) -> u8 {
+    *reg as u8
+}
+
+
 pub enum Flags {
     ZERO   = 1,
     CARRY  = 2,
@@ -110,6 +117,14 @@ impl WAFFLE {
     }
 
     pub fn cast_to_bytes(&self, data: i64) -> [u8; 8] {
+        if self._platform_big_endian {
+            data.to_be_bytes()
+        } else {
+            data.to_le_bytes()
+        }
+    }
+
+    pub fn cast_to_bytesz(&self, data: usize) -> [u8; 8] {
         if self._platform_big_endian {
             data.to_be_bytes()
         } else {

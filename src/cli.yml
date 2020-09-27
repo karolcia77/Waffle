@@ -5,20 +5,22 @@ about: It's a stack-based VM
 
 subcommands:
   - run:
-      - help: Runs the specified bytecode file. it will try to execute the bytecode directly.
-      - args:
-          - FILE:
-              help: Sets the bytecode file in use.
-              required: true
-              value_name: FILE
-              index: 1
-          - MEMORY:
-              help: Sets the amount of the memory pool in bytes.
-              index: 2
-              value_name: MEMORY
-              default_value: 1024
+    about: Runs the specified bytecode file. it will try to execute the bytecode directly.
+    version: "0.0.1"
+    args:
+      - FILE:
+          help: Sets the bytecode file in use.
+          required: true
+          value_name: FILE
+          index: 1
+      - MEMORY:
+          help: Sets the amount of the memory pool in bytes.
+          index: 2
+          value_name: MEMORY
+          default_value: 1024
   - compile:
-      help: Creates a bytecode file.
+      about: Creates a bytecode file.
+      version: "0.0.1"
       args:
         - FILE:
             help: Sets the source file in use.

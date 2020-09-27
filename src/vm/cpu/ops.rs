@@ -44,7 +44,7 @@ fn execute(cpu: &mut WAFFLE) {
         INST::LDI => {},
         INST::STI => {},
         INST::LLI => cpu.register_write(cpu.memory_read(destination) as usize, cpu.memory_read(source)),
-        INST::ADD => cpu.register_write(cpu.registers[]),
+        INST::ADD => {},
         INST::SUB => {},
         INST::MUL => {},
         INST::DIV => {},

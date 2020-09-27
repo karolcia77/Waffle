@@ -2,6 +2,7 @@ use std::process::exit;
 use std::str::FromStr;
 use crate::vm::types::Types;
 
+#[repr(u8)]
 #[derive(PartialEq, PartialOrd, Debug)]
 pub enum Instruction {
     CLF,                      // Clear CPU Flags [0]
@@ -141,6 +142,62 @@ impl FromStr for Instruction {
             _ => exit(42)
         };
         Ok(op)
+    }
+}
+
+impl Into<u8> for Instruction {
+    fn into(self) -> u8 {
+        match self {
+            Instruction::STOP => 0x00,
+            Instruction::HALT => 0x01,
+            Instruction::PSH => 0x02,
+            Instruction::POP => 0x03,
+            Instruction::PSHF => 0x04,
+            Instruction::POPF => 0x05,
+            Instruction::DSPL => 0x06,
+            Instruction::DSPLN =>0x07,
+            Instruction::MOV => 0x10,
+            Instruction::LDI => 0x11,
+            Instruction::STI => 0x12,
+            Instruction::LLI => 0x13,
+            Instruction::ADD => 0x14,
+            Instruction::SUB => 0x15,
+            Instruction::MUL => 0x16,
+            Instruction::DIV => 0x17,
+            Instruction::SHR => 0x18,
+            Instruction::SHL => 0x19,
+            Instruction::MOVF =>0x20,
+            Instruction::LDF => 0x21,
+            Instruction::STF => 0x22,
+            Instruction::LLF => 0x23,
+            Instruction::FADD =>0x24,
+            Instruction::FSUB =>0x25,
+            Instruction::FMUL =>0x26,
+            Instruction::FDIV =>0x27,
+            Instruction::LAND =>0x30,
+            Instruction::LOR => 0x31,
+            Instruction::LNOT =>0x32,
+            Instruction::AND => 0x33,
+            Instruction::OR => 0x34,
+            Instruction::XOR => 0x35,
+            Instruction::NOT => 0x36,
+            Instruction::JMP =>0x40,
+            Instruction::JA => 0x41,
+            Instruction::JB => 0x42,
+            Instruction::JE => 0x43,
+            Instruction::JNE =>0x44,
+            Instruction::JZ => 0x45,
+            Instruction::JNZ =>0x46,
+            Instruction::JC => 0x47,
+            Instruction::JNC =>0x48,
+            Instruction::JS => 0x49,
+            Instruction::JNS =>0x4A,
+            Instruction::JL => 0x4B,
+            Instruction::JNL =>0x4C,
+            Instruction::JP => 0x4D,
+            Instruction::JNP =>0x4E,
+            _ => exit(42),
+        }
     }
 }
 
