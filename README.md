@@ -1,6 +1,7 @@
 <div align="center">
     <img src="logo/waffle.png">
     <p>Is a little stack-based VM built for educational purposes.</p>
+    <blockquote> <b>WAFFLE</b> (<i>verb</i>): use many words but say nothing important; avoid making decision or stating clear opinion.</blockquote>
 </div>
 
 
