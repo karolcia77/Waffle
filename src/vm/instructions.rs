@@ -3,7 +3,7 @@ use std::str::FromStr;
 use crate::vm::types::Types;
 
 #[repr(u8)]
-#[derive(PartialEq, PartialOrd, Debug)]
+#[derive(PartialEq, PartialOrd, Debug, Copy, Clone)]
 pub enum Instruction {
     CLF,                      // Clear CPU Flags [0]
     MOV, MOVF, INC, DEC,      // Register ops [2;1]
@@ -30,30 +30,23 @@ impl Instruction {
         match self {
             Instruction::STOP => vec![Types::OPERATION],
             Instruction::HALT => vec![Types::OPERATION],
-            Instruction::PSH => vec![Types::OPERATION, Types::REGISTER],
-            Instruction::POP => vec![Types::OPERATION, Types::REGISTER],
-            Instruction::PSHF => vec![Types::OPERATION, Types::REGISTER],
-            Instruction::POPF => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::PSH|Instruction::POP => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::PSHF|Instruction::POPF => vec![Types::OPERATION, Types::REGISTER],
             Instruction::DSPL => vec![Types::OPERATION, Types::REGISTER],
             Instruction::DSPLN => vec![Types::OPERATION, Types::REGISTER],
-            Instruction::MOV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::LDI => vec![Types::OPERATION, Types::REGISTER, Types::ADDRESS],
-            Instruction::STI => vec![Types::OPERATION, Types::ADDRESS, Types::REGISTER],
-            Instruction::LLI => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
-            Instruction::ADD => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::SUB => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::MUL => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::DIV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::SHR => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
-            Instruction::SHL => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
-            Instruction::MOVF => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::LDF => vec![Types::OPERATION, Types::REGISTER, Types::ADDRESS],
-            Instruction::STF => vec![Types::OPERATION, Types::ADDRESS, Types::REGISTER],
-            Instruction::LLF => vec![Types::OPERATION, Types::REGISTER, Types::NUMBER],
-            Instruction::FADD => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::FSUB => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::FMUL => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
-            Instruction::FDIV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::INC => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::DEC => vec![Types::OPERATION, Types::REGISTER],
+            Instruction::MOV|Instruction::MOVF => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::LDI|Instruction::LDF => vec![Types::OPERATION, Types::REGISTER, Types::ADDRESS],
+            Instruction::STI|Instruction::STF => vec![Types::OPERATION, Types::ADDRESS, Types::REGISTER],
+            Instruction::LLI => vec![Types::OPERATION, Types::REGISTER, Types::INTEGER],
+            Instruction::LLF => vec![Types::OPERATION, Types::REGISTER, Types::DECIMAL],
+            Instruction::ADD|Instruction::FADD => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::SUB|Instruction::FSUB => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::MUL|Instruction::FMUL => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::DIV|Instruction::FDIV => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
+            Instruction::SHR => vec![Types::OPERATION, Types::REGISTER, Types::INTEGER],
+            Instruction::SHL => vec![Types::OPERATION, Types::REGISTER, Types::INTEGER],
             Instruction::LAND => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
             Instruction::LOR => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
             Instruction::LNOT => vec![Types::OPERATION, Types::REGISTER, Types::REGISTER],
@@ -97,6 +90,8 @@ impl FromStr for Instruction {
             "POPF" => Instruction::POPF,
             "DSPL" => Instruction::DSPL,
             "DSPLN" => Instruction::DSPLN,
+            "INC" => Instruction::INC,
+            "DEC" => Instruction::DEC,
             // INT
             "MOV" => Instruction::MOV,
             "LDI" => Instruction::LDI,
@@ -162,6 +157,8 @@ impl Into<u8> for Instruction {
             Instruction::POPF => 0x05,
             Instruction::DSPL => 0x06,
             Instruction::DSPLN =>0x07,
+            Instruction::INC => 0x08,
+            Instruction::DEC => 0x09,
             Instruction::MOV => 0x10,
             Instruction::LDI => 0x11,
             Instruction::STI => 0x12,
@@ -222,6 +219,8 @@ impl From<u8> for Instruction {
             0x05 => Instruction::POPF,
             0x06 => Instruction::DSPL,
             0x07 => Instruction::DSPLN,
+            0x08 => Instruction::INC,
+            0x09 => Instruction::DEC,
             // INT
             0x10 => Instruction::MOV,
             0x11 => Instruction::LDI,

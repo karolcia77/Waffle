@@ -1,26 +1,41 @@
+use crate::vm::instructions::Instruction;
+
 #[derive(Clone, Copy, Debug)]
 pub enum Types {
     STRING,
-    NUMBER,
+    INTEGER,
     DECIMAL,
     OPERATION,
     ADDRESS,
     REGISTER,
     FUNCTION,
+    ERROR,
     ANY,
 }
 
+
+impl Types {
+    pub fn bytes_needed(self) -> usize {
+        match self {
+            Types::INTEGER |Types::DECIMAL|Types::ADDRESS => 8,
+            Types::OPERATION|Types::REGISTER|Types::FUNCTION => 1,
+            _ => 8
+        }
+    }
+}
+
+
 #[derive(Debug)]
 pub struct Lexeme {
-    type_info: Types, // stores type information
-    value: Vec<u8>,   // stores bytes
-    position: usize
+    pub instruction: Instruction,
+    pub type_info: Types, // stores type information
+    pub value: Vec<u8>,   // stores bytes
 }
 
 
 impl Lexeme {
-    pub fn new(type_info: Types, value: Vec<u8>, position: usize) -> Self {
-        Lexeme {type_info, value, position}
+    pub fn new(type_info: Types, instruction: Instruction, value: Vec<u8>) -> Self {
+        Lexeme {type_info, instruction, value}
     }
 
     pub fn get_type_size(&self) -> usize {

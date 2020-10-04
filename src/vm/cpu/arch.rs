@@ -100,7 +100,7 @@ fn is_big_endian() -> bool {
 impl WAFFLE {
     pub fn new(mem_size: usize) -> WAFFLE {
         WAFFLE {
-            mem: Vec::with_capacity(mem_size),
+            mem: vec![0; mem_size],
             mem_size,
             pc: 0,
             sp: mem_size - 1,
@@ -158,9 +158,19 @@ impl WAFFLE {
         }
     }
 
+    pub fn memory_write(&mut self, addr: usize, value: i64) {
+        let as_bytes= self.cast_to_bytes(value);
+        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el=as_bytes[idx]).count();
+    }
+
+    pub fn memory_writef(&mut self, addr: usize, value: f64) {
+        let as_bytes= self.cast_to_bytesf(value);
+        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el=as_bytes[idx]).count();
+    }
+
     pub fn memory_read(&self, addr: usize) -> i64 {
         let mut arr = [0u8;8];
-        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
+        self.mem[addr..=addr+7].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
         if self._platform_big_endian{
             i64::from_be_bytes(arr)
         } else {
@@ -170,7 +180,7 @@ impl WAFFLE {
 
     pub fn memory_readf(&self, addr: usize) -> f64 {
         let mut arr = [0u8;8];
-        self.mem[addr..addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
+        self.mem[addr..=addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
         if self._platform_big_endian{
             f64::from_be_bytes(arr)
         } else {
@@ -178,12 +188,20 @@ impl WAFFLE {
         }
     }
 
-    pub fn register_write(&mut self, register: usize, data: i64) {
-        self.registers[register] = data;
+    pub fn register_read(&self, addr: usize) -> i64 {
+        self.registers[self.mem[addr] as usize]
     }
 
-    pub fn register_writef(&mut self, register: usize, data: f64) {
-        self.fregisters[register] = data;
+    pub fn register_readf(&self, addr: usize) -> f64 {
+        self.fregisters[self.mem[addr] as usize]
+    }
+
+    pub fn register_write(&mut self, addr: usize, data: i64) {
+        self.registers[self.mem[addr] as usize] = data;
+    }
+
+    pub fn register_writef(&mut self, addr: usize, data: f64) {
+        self.fregisters[self.mem[addr] as usize] = data;
     }
 
     pub fn flags_clear(&mut self) {self.flags = 0;}

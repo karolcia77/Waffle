@@ -1,12 +1,25 @@
 name: WAFFLE
-version: "0.0.1a"
+version: "0.1"
 author: iy <github.com/Nyanguy>
 about: It's a stack-based VM
 
 subcommands:
+  - titbits:
+      about: Reverses the bytecode into the waffle code.
+      args:
+        - SYRUP:
+            help: A file containing bytecode.
+            required: true
+            value_name: SYRUP
+            index: 1
+        - OUT:
+            help: Sets the destination file with the bytecode.
+            takes_value: true
+            value_name: OUT
+            index: 2
+            default_value: "dutch.wfl"
   - with:
       about: Runs specified bytecode file.
-      version: "0.0.1"
       args:
         - SYRUP:
             help: Sets the bytecode file in use.
@@ -20,7 +33,6 @@ subcommands:
             default_value: "1024"
   - syrup:
       about: Creates a bytecode file.
-      version: "0.0.1"
       args:
         - SOURCE:
             help: Sets the source file in use.
