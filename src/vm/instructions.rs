@@ -76,7 +76,10 @@ impl Instruction {
             Instruction::JNL => vec![Types::OPERATION, Types::ADDRESS],
             Instruction::JP => vec![Types::OPERATION, Types::ADDRESS],
             Instruction::JNP => vec![Types::OPERATION, Types::ADDRESS],
-            _ => exit(42),
+            _ => {
+                println!("\nError: Could not parse Instruction::{:?}", self);
+                exit(42)
+            },
         }
     }
 }
@@ -139,7 +142,10 @@ impl FromStr for Instruction {
             "JP" => Instruction::JP,
             "JNP" => Instruction::JNP,
             // INVALID OPCODES
-            _ => exit(42)
+            _ => {
+                println!("\nError: Could not match <{}> with the Instruction set", orig);
+                exit(42)
+            }
         };
         Ok(op)
     }
@@ -196,7 +202,10 @@ impl Into<u8> for Instruction {
             Instruction::JNL =>0x4C,
             Instruction::JP => 0x4D,
             Instruction::JNP =>0x4E,
-            _ => exit(42),
+            _ => {
+                println!("\nError: Could not convert Instruction::{:?} into a bytecode", self);
+                exit(42)
+            },
         }
     }
 }

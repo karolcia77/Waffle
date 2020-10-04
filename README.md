@@ -8,7 +8,22 @@
 ## Usage
 
 ```shell script
-./waffle --help
+λ  ./target/debug/waffle --help
+WAFFLE 0.0.1a
+iy <github.com/Nyanguy>
+It's a stack-based VM
+
+USAGE:
+    waffle [SUBCOMMAND]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    help     Prints this message or the help of the given subcommand(s)
+    syrup    Creates a bytecode file.
+    with     Runs specified bytecode file.
 ```
 
 

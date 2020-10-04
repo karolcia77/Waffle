@@ -1,4 +1,4 @@
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Types {
     STRING,
     NUMBER,
@@ -10,6 +10,7 @@ pub enum Types {
     ANY,
 }
 
+#[derive(Debug)]
 pub struct Lexeme {
     type_info: Types, // stores type information
     value: Vec<u8>,   // stores bytes

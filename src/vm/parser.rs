@@ -6,6 +6,7 @@ use crate::vm::types::{Lexeme, Types};
 use crate::vm::cpu::arch::{Register, WAFFLE, get_register_idx};
 use std::process::exit;
 
+
 pub fn read_source_file(filename: &Path) -> io::Lines<io::BufReader<File>> {
     let file = File::open(filename).unwrap();
     io::BufReader::new(file).lines()
@@ -23,16 +24,19 @@ pub fn lexer(cpu: WAFFLE, filename: &Path) -> Vec<Lexeme> {
                                          vec![operation.into()],
                                          num*idx));
             } else {
+
                 let arg_type = types_map
                     .get(idx)
-                    .expect(&format!("Wrong number of arguments at col:{} row:{}", num, idx));
+                    .expect(&format!("\nERROR: Wrong number of arguments at {:?}:{}:{}", filename, num, idx));
                 let value = match arg_type {
                     Types::REGISTER => vec![get_register_idx(&op.parse::<Register>().unwrap())],
                     Types::ADDRESS => Vec::from(cpu.cast_to_bytesz(op.parse::<usize>().unwrap())),
                     Types::NUMBER => Vec::from(cpu.cast_to_bytes(op.parse::<i64>().unwrap())),
                     Types::DECIMAL => Vec::from(cpu.cast_to_bytesf(op.parse::<f64>().unwrap())),
                     Types::STRING => Vec::from(op.as_bytes()),
-                    _ => exit(52),
+                    _ => {
+                        println!("\nERROR: at {:?}:{}:{}", filename, num, idx);
+                        exit(52)},
                 };
                 lexemes.push(Lexeme::new(*arg_type, value, num*idx));
             }
