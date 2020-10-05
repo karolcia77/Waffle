@@ -1,11 +1,11 @@
 name: WAFFLE
 version: "0.1"
 author: iy <github.com/Nyanguy>
-about: It's a stack-based VM
+about: It's a stack-based VM!
 
 subcommands:
   - titbits:
-      about: Reverses the bytecode into the waffle code.
+      about: Reverses specified bytecode file into the waffle source code.
       args:
         - SYRUP:
             help: A file containing bytecode.

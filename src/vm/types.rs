@@ -1,6 +1,6 @@
 use crate::vm::instructions::Instruction;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Types {
     STRING,
     INTEGER,
@@ -36,6 +36,12 @@ pub struct Lexeme {
 impl Lexeme {
     pub fn new(type_info: Types, instruction: Instruction, value: Vec<u8>) -> Self {
         Lexeme {type_info, instruction, value}
+    }
+
+    pub fn value_as_array(&self) -> [u8;8] {
+        let mut arr = [0u8; 8];
+        self.value.iter().enumerate().map(|(idx,x)| arr[idx] = *x).count();
+        arr
     }
 
     pub fn get_type_size(&self) -> usize {

@@ -24,6 +24,13 @@ pub enum Instruction {
     STOP
 }
 
+impl std::fmt::Display for Instruction {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+
 
 impl Instruction {
     pub fn arg_types_map(&self) -> Vec<Types>{

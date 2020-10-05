@@ -1,14 +1,11 @@
 #[allow(dead_code)]
 mod vm;
 use clap::{App, load_yaml};
-use crate::vm::cpu::arch::{WAFFLE, Register, get_register_idx};
+use crate::vm::cpu::arch::WAFFLE;
 use crate::vm::cpu::ops::run;
-use crate::vm::instructions::Instruction;
-use std::convert::TryInto;
 use std::fs::File;
-use std::any::Any;
 use std::process::exit;
-use crate::vm::parser::{lexer, compiler, consume_syrup, read_as_byte_vec};
+use crate::vm::parser::{lexer, compiler, consume_syrup, read_as_byte_vec, generate_source};
 use std::path::Path;
 use std::io::Write;
 
@@ -30,8 +27,14 @@ fn main() {
         },
         ("titbits", Some(run_comm)) => {
             let file = run_comm.value_of("SYRUP").expect("A file was not provided. Ask --help");
+            let fout = run_comm.value_of("OUT").expect("A file was not provided. Ask --help");
+            print!("Reversing...");
             let lexemes = consume_syrup(Path::new(file));
-            println!("{:?}", lexemes)
+            println!("Done");
+            let mut cpu = WAFFLE::new(1024);
+            print!("Writing into {}...", fout);
+            generate_source(&cpu, Path::new(fout), lexemes);
+            println!("Done");
         }
         ("syrup", Some(compile_comm)) => {
             let file_path = compile_comm.value_of("SOURCE").expect("A source file was not provided. Ask --help");

@@ -3,10 +3,16 @@ use std::str::FromStr;
 use std::convert::From;
 use std::process::exit;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Register {
     AX, BX, CX, DX, EX, FX, GX, HX,
     FAX, FBX, FCX, FDX, FEX, FFX, FGX, FHX,
+}
+
+impl std::fmt::Display for Register {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 impl FromStr for Register {
@@ -89,7 +95,7 @@ pub struct WAFFLE {
     pub fregisters: [f64; 8],
     flags: u8,
     pub inst: Instruction,
-    _platform_big_endian: bool
+    pub _platform_big_endian: bool
 }
 
 fn is_big_endian() -> bool {
@@ -114,6 +120,22 @@ impl WAFFLE {
 
     pub fn load_program(&mut self, prog: Vec<u8>) {
         self.mem = prog
+    }
+
+    pub fn cast_from_bytes(&self, data: [u8;8]) -> i64 {
+        if self._platform_big_endian {
+            i64::from_be_bytes(data)
+        } else {
+            i64::from_le_bytes(data)
+        }
+    }
+
+    pub fn cast_from_bytesf(&self, data: [u8;8]) -> f64 {
+        if self._platform_big_endian {
+            f64::from_be_bytes(data)
+        } else {
+            f64::from_le_bytes(data)
+        }
     }
 
     pub fn cast_to_bytes(&self, data: i64) -> [u8; 8] {
@@ -160,17 +182,17 @@ impl WAFFLE {
 
     pub fn memory_write(&mut self, addr: usize, value: i64) {
         let as_bytes= self.cast_to_bytes(value);
-        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el=as_bytes[idx]).count();
+        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el = as_bytes[idx]).count();
     }
 
     pub fn memory_writef(&mut self, addr: usize, value: f64) {
         let as_bytes= self.cast_to_bytesf(value);
-        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el=as_bytes[idx]).count();
+        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el = as_bytes[idx]).count();
     }
 
     pub fn memory_read(&self, addr: usize) -> i64 {
         let mut arr = [0u8;8];
-        self.mem[addr..=addr+7].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
+        self.mem[addr..=addr+7].iter().enumerate().map(|(idx,el)| arr[idx] = *el).count();
         if self._platform_big_endian{
             i64::from_be_bytes(arr)
         } else {
@@ -180,7 +202,7 @@ impl WAFFLE {
 
     pub fn memory_readf(&self, addr: usize) -> f64 {
         let mut arr = [0u8;8];
-        self.mem[addr..=addr+9].iter().enumerate().map(|(idx,el)| arr[idx]=*el).count();
+        self.mem[addr..=addr+9].iter().enumerate().map(|(idx,el)| arr[idx] = *el).count();
         if self._platform_big_endian{
             f64::from_be_bytes(arr)
         } else {
