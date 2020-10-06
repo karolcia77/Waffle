@@ -47,7 +47,7 @@ fn main() {
             let bc = compiler(&lexemes);
             println!("DONE");
             print!("Writing into {} ...", out_path);
-            let mut out = File::create(out_path).expect(&format!("Error: Could not create a file {}", out_path));
+            let mut out = File::create(out_path).unwrap_or_else(|_| panic!("Error: Could not create a file {}", out_path));
             out.write_all(bc.as_slice()).expect("Error: Failed to write bytecode to the file");
             println!("DONE");
         },

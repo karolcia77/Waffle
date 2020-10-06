@@ -100,11 +100,7 @@ pub struct WAFFLE {
 
 fn is_big_endian() -> bool {
     let x: u32 = 0x1;
-    if (x>>24)&0xff == 1{
-        false
-    } else {
-        true
-    }
+    (x>>24)&0xff != 1
 }
 
 
@@ -187,12 +183,12 @@ impl WAFFLE {
 
     pub fn memory_write(&mut self, addr: usize, value: i64) {
         let as_bytes= self.cast_to_bytes(value);
-        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el = as_bytes[idx]).count();
+        self.mem[addr..=addr+9].iter_mut().enumerate().for_each(|(idx, el)|*el = as_bytes[idx]);
     }
 
     pub fn memory_writef(&mut self, addr: usize, value: f64) {
         let as_bytes= self.cast_to_bytesf(value);
-        self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el = as_bytes[idx]).count();
+        self.mem[addr..=addr+9].iter_mut().enumerate().for_each(|(idx, el)|*el = as_bytes[idx]);
     }
 
     pub fn memory_read_byte(&self, addr: usize) -> u8 {
@@ -201,7 +197,7 @@ impl WAFFLE {
 
     pub fn memory_read(&self, addr: usize) -> i64 {
         let mut arr = [0u8;8];
-        self.mem[addr..=addr+7].iter().enumerate().map(|(idx,el)| arr[idx] = *el).count();
+        self.mem[addr..=addr+7].iter().enumerate().for_each(|(idx,el)| arr[idx] = *el);
         if self._platform_big_endian{
             i64::from_be_bytes(arr)
         } else {
@@ -211,7 +207,7 @@ impl WAFFLE {
 
     pub fn memory_readf(&self, addr: usize) -> f64 {
         let mut arr = [0u8;8];
-        self.mem[addr..=addr+9].iter().enumerate().map(|(idx,el)| arr[idx] = *el).count();
+        self.mem[addr..=addr+9].iter().enumerate().for_each(|(idx,el)| arr[idx] = *el);
         if self._platform_big_endian{
             f64::from_be_bytes(arr)
         } else {

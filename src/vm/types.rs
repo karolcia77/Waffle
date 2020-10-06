@@ -40,7 +40,7 @@ impl Lexeme {
 
     pub fn value_as_array(&self) -> [u8;8] {
         let mut arr = [0u8; 8];
-        self.value.iter().enumerate().map(|(idx,x)| arr[idx] = *x).count();
+        self.value.iter().enumerate().for_each(|(idx,x)| arr[idx] = *x);
         arr
     }
 

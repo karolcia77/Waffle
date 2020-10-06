@@ -13,7 +13,7 @@ pub fn read_source_file(filename: &Path) -> io::Lines<io::BufReader<fs::File>> {
 }
 
 pub fn generate_source(cpu: &WAFFLE, filename: &Path, lexemes: Vec<Lexeme>) {
-    let file = fs::File::create(filename).expect(&format!("Error: Failed to create file {}", filename.to_str().unwrap()));
+    let file = fs::File::create(filename).unwrap_or_else(|_| panic!("Error: Failed to create file {}", filename.to_str().unwrap()));
     let mut file = LineWriter::new(file);
     let mut line = String::new();
     for lex in lexemes {
@@ -35,12 +35,12 @@ pub fn generate_source(cpu: &WAFFLE, filename: &Path, lexemes: Vec<Lexeme>) {
 
 
 pub fn read_as_byte_vec(filename: &str, buffer: &mut Vec<u8>) {
-    let mut f = fs::File::open(&filename).expect(&format!("Error: Failed to load file {}", filename));
-    f.read(buffer).expect("Error: Buffer overflow! Consider increasing the memory size");
+    let mut f = fs::File::open(&filename).unwrap_or_else(|_| panic!("Error: Failed to load file {}", filename));
+    f.read_exact(buffer).expect("Error: Buffer overflow! Consider increasing the memory size");
 }
 
 
-pub fn compiler(lexemes: &Vec<Lexeme>) -> Vec<u8> {
+pub fn compiler(lexemes: &[Lexeme]) -> Vec<u8> {
     let mut byte_code:Vec<u8> = Vec::new();
     for op in lexemes {
         byte_code.extend(&op.value);
@@ -51,7 +51,7 @@ pub fn compiler(lexemes: &Vec<Lexeme>) -> Vec<u8> {
 
 pub fn consume_syrup(filename: &Path) -> Vec<Lexeme> {
     let mut lexemes: Vec<Lexeme> = Vec::new();
-    let mut file = fs::File::open(filename).expect(&format!("Error: Could not open file {}", filename.to_str().unwrap()));
+    let mut file = fs::File::open(filename).unwrap_or_else(|_| panic!("Error: Could not open file {}", filename.to_str().unwrap()));
     let mut buffer = [0u8; 8];
     let mut current_types = vec![Types::OPERATION];
     let mut current_map_pos = 0;
@@ -60,7 +60,7 @@ pub fn consume_syrup(filename: &Path) -> Vec<Lexeme> {
     let size = file.metadata().unwrap().len();
     while read_size<=size {
         let current_type = *current_types.get(current_map_pos)
-            .expect(&format!("Error: Failed to get Map of the operands for {:?}", instruction));
+            .unwrap_or_else(|| panic!("Error: Failed to get Map of the operands for {:?}", instruction));
         match current_type {
             Types::OPERATION => {
                 (&mut file).take(1).read_exact(&mut buffer[..1]).unwrap();
@@ -100,7 +100,7 @@ pub fn lexer(cpu: &WAFFLE, filename: &Path) -> Vec<Lexeme> {
         let mut types_map: Vec<Types> = Vec::with_capacity(3);
         let mut operation = Instruction::HALT;
         for (idx, op) in line.unwrap().split_whitespace().enumerate() {
-            if op.starts_with("#") { // It's a comment at the end of a line.
+            if op.starts_with('#') { // It's a comment at the end of a line.
                 break  // Skip the rest of a line.
             }
             if idx == 0 {
@@ -111,7 +111,7 @@ pub fn lexer(cpu: &WAFFLE, filename: &Path) -> Vec<Lexeme> {
             } else {
                 let arg_type = types_map
                     .get(idx)
-                    .expect(&format!("\nERROR: Wrong number of arguments at {:?}:{}:{}", filename, num+1, idx+1));
+                    .unwrap_or_else(|| panic!("\nERROR: Wrong number of arguments at {:?}:{}:{}", filename, num+1, idx+1));
                 let value = match arg_type {
                     Types::REGISTER => vec![get_register_idx(&op.parse::<Register>().unwrap())],
                     Types::ADDRESS => Vec::from(cpu.cast_to_bytesz(op.parse::<usize>().unwrap())),
