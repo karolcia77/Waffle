@@ -1,6 +1,6 @@
-LLI AX 0
-LLI BX 2
-ADD AX BX
-INC AX
-DSPLN AX
-STOP
+LLI AX 10   # I'm a comment
+LLI BX 2    # a load local integer instruction
+ADD AX BX   # add register contents
+INC AX      # increment AX contents
+DSPLN AX    # this will output AX contents with a newline at the end!
+STOP        # terminate the process.

@@ -18,7 +18,7 @@ fn execute(cpu: &mut WAFFLE) {
         shift += args[1].bytes_needed();
     }
     if args.len() > 2 {
-        source = cpu.pc + args[1].bytes_needed();
+        source = cpu.pc + args[1].bytes_needed() + 1;
         shift += args[2].bytes_needed();
     }
     cpu.pc += shift;
@@ -33,21 +33,22 @@ fn execute(cpu: &mut WAFFLE) {
         INST::POP   => cpu.register_write(destination, cpu.memory_read(cpu.sp)),
         INST::POPF  => cpu.register_writef(destination, cpu.memory_readf(cpu.sp)),
         INST::DSPL  => {
-            if destination > 7 {
+            let reg = cpu.memory_read(destination);
+            if reg > 7 {
                 print!("{}", cpu.register_readf(destination));
             } else {
                 print!("{}", cpu.register_read(destination));
             }
         },
         INST::DSPLN => {
-            if destination > 7 {
+            if cpu.mem[destination] > 7 {
                 println!("{}", cpu.register_readf(destination));
             } else {
                 println!("{}", cpu.register_read(destination));
             }
         },
         INST::INC => {
-            if destination > 7 {
+            if cpu.mem[destination] > 7 {
                 cpu.register_writef(destination, cpu.register_readf(destination) + 1.0);
             } else {
                 cpu.register_write(destination, cpu.register_read(destination) + 1);

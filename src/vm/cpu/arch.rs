@@ -99,7 +99,12 @@ pub struct WAFFLE {
 }
 
 fn is_big_endian() -> bool {
-    cfg!(target_endian="big")
+    let x: u32 = 0x1;
+    if (x>>24)&0xff == 1{
+        false
+    } else {
+        true
+    }
 }
 
 
@@ -188,6 +193,10 @@ impl WAFFLE {
     pub fn memory_writef(&mut self, addr: usize, value: f64) {
         let as_bytes= self.cast_to_bytesf(value);
         self.mem[addr..=addr+9].iter_mut().enumerate().map(|(idx, el)|*el = as_bytes[idx]).count();
+    }
+
+    pub fn memory_read_byte(&self, addr: usize) -> u8 {
+        self.mem[addr]
     }
 
     pub fn memory_read(&self, addr: usize) -> i64 {

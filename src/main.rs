@@ -22,7 +22,6 @@ fn main() {
             let file = run_comm.value_of("SYRUP").expect("A file was not provided. Ask --help");
             let mut cpu = WAFFLE::new(mem);
             read_as_byte_vec(file, &mut cpu.mem);
-            // println!("{:?}", cpu.mem);
             run(&mut cpu);
         },
         ("titbits", Some(run_comm)) => {
@@ -32,7 +31,7 @@ fn main() {
             let lexemes = consume_syrup(Path::new(file));
             println!("Done");
             let mut cpu = WAFFLE::new(1024);
-            print!("Writing into {}...", fout);
+            print!("Writing into {} ...", fout);
             generate_source(&cpu, Path::new(fout), lexemes);
             println!("Done");
         }
@@ -47,8 +46,10 @@ fn main() {
             print!("COMPILING...");
             let bc = compiler(&lexemes);
             println!("DONE");
+            print!("Writing into {} ...", out_path);
             let mut out = File::create(out_path).expect(&format!("Error: Could not create a file {}", out_path));
             out.write_all(bc.as_slice()).expect("Error: Failed to write bytecode to the file");
+            println!("DONE");
         },
         _ => {println!("No argument was supplied. Ask --help"); exit(1)},
     }

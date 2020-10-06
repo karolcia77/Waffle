@@ -100,16 +100,18 @@ pub fn lexer(cpu: &WAFFLE, filename: &Path) -> Vec<Lexeme> {
         let mut types_map: Vec<Types> = Vec::with_capacity(3);
         let mut operation = Instruction::HALT;
         for (idx, op) in line.unwrap().split_whitespace().enumerate() {
+            if op.starts_with("#") { // It's a comment at the end of a line.
+                break  // Skip the rest of a line.
+            }
             if idx == 0 {
                 operation = op.parse::<Instruction>().unwrap();
                 types_map = operation.arg_types_map();
                 lexemes.push(Lexeme::new(*types_map.get(0).unwrap(), operation,
                                          vec![operation.into()]));
             } else {
-
                 let arg_type = types_map
                     .get(idx)
-                    .expect(&format!("\nERROR: Wrong number of arguments at {:?}:{}:{}", filename, num, idx));
+                    .expect(&format!("\nERROR: Wrong number of arguments at {:?}:{}:{}", filename, num+1, idx+1));
                 let value = match arg_type {
                     Types::REGISTER => vec![get_register_idx(&op.parse::<Register>().unwrap())],
                     Types::ADDRESS => Vec::from(cpu.cast_to_bytesz(op.parse::<usize>().unwrap())),
@@ -117,7 +119,7 @@ pub fn lexer(cpu: &WAFFLE, filename: &Path) -> Vec<Lexeme> {
                     Types::DECIMAL => Vec::from(cpu.cast_to_bytesf(op.parse::<f64>().unwrap())),
                     Types::STRING => Vec::from(op.as_bytes()),
                     _ => {
-                        println!("\nERROR: at {:?}:{}:{}", filename, num, idx);
+                        println!("\nERROR: at {:?}:{}:{}", filename, num+1, idx+1);
                         exit(52)},
                 };
                 lexemes.push(Lexeme::new(*arg_type, operation, value));
