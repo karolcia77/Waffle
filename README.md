@@ -4,6 +4,10 @@
     <blockquote> <b>WAFFLE</b> (<i>verb</i>): use many words but say nothing important; avoid making decision or stating clear opinion.</blockquote>
 </div>
 
+<span>
+    <img src="https://img.shields.io/github/workflow/status/nyanguy/waffle/Build?style=for-the-badge"/>
+    <img src="https://img.shields.io/github/v/release/nyanguy/waffle?style=for-the-badge"/>
+</span>
 
 ## Usage
 
