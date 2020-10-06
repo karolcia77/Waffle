@@ -30,7 +30,7 @@ fn main() {
             print!("Reversing...");
             let lexemes = consume_syrup(Path::new(file));
             println!("Done");
-            let mut cpu = WAFFLE::new(1024);
+            let cpu = WAFFLE::new(1024);
             print!("Writing into {} ...", fout);
             generate_source(&cpu, Path::new(fout), lexemes);
             println!("Done");
@@ -38,7 +38,7 @@ fn main() {
         ("syrup", Some(compile_comm)) => {
             let file_path = compile_comm.value_of("SOURCE").expect("A source file was not provided. Ask --help");
             let out_path = compile_comm.value_of("OUT").unwrap_or_default();
-            let mut cpu = WAFFLE::new(1024);
+            let cpu = WAFFLE::new(1024);
             print!("LEXING...");
             let lexemes = lexer(&cpu, Path::new(file_path));
             println!("DONE");

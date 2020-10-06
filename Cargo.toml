@@ -8,4 +8,3 @@ edition = "2018"
 
 [dependencies]
 clap = {version="2.33.3", features=["yaml"]}
-num-traits = "0.2"

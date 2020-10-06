@@ -63,7 +63,7 @@ pub fn consume_syrup(filename: &Path) -> Vec<Lexeme> {
             .expect(&format!("Error: Failed to get Map of the operands for {:?}", instruction));
         match current_type {
             Types::OPERATION => {
-                (&mut file).take(1).read_exact(&mut buffer[..1]);
+                (&mut file).take(1).read_exact(&mut buffer[..1]).unwrap();
                 instruction = Instruction::from(buffer[0]);
                 lexemes.push(Lexeme::new(current_type, instruction,vec![buffer[0]]));
                 current_types = instruction.arg_types_map();
@@ -71,13 +71,13 @@ pub fn consume_syrup(filename: &Path) -> Vec<Lexeme> {
                 read_size += 1;
             },
             Types::REGISTER => {
-                (&mut file).take(1).read_exact(&mut buffer[..1]);
+                (&mut file).take(1).read_exact(&mut buffer[..1]).unwrap();
                 lexemes.push(Lexeme::new(current_type, instruction,vec![buffer[0]]));
                 current_map_pos += 1;
                 read_size += 1;
             },
             Types::DECIMAL|Types::INTEGER |Types::ADDRESS => {
-                (&mut file).take(8).read_exact(&mut buffer);
+                (&mut file).take(8).read_exact(&mut buffer).unwrap();
                 lexemes.push(Lexeme::new(current_type, instruction,buffer.to_vec()));
                 current_map_pos += 1;
                 read_size += 8;
